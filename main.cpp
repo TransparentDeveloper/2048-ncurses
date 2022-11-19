@@ -1,7 +1,9 @@
-/* senet.c */
-
+#include "contrlArray.cpp"
 #include <ncurses.h>
 #include <stdlib.h>
+#include <string>
+
+using namespace std;
 
 #define SQ_HEIGHT 5
 #define SQ_WIDTH 12
@@ -10,6 +12,7 @@
 
 void create_board(void);
 void destroy_board(void);
+void set_val_board(blockLog *block);
 
 WINDOW *BOARD[16];
 
@@ -34,8 +37,15 @@ int main(int argc, char **argv) {
     mvprintw(0, 0, "2048");
     refresh();
 
-    /* draw board */
+    /* create value */
+    blockLog block;
+    block.term = 0;
+    block.state = {0};
+    create_random(&block);
     create_board();
+    set_val_board(&block);
+
+    /* */
 
     do {
         key = getch();
@@ -46,6 +56,19 @@ int main(int argc, char **argv) {
 
     endwin();
     exit(0);
+}
+
+void set_val_board(blockLog *block) {
+    int num;
+
+    for (int row = 0; row < NUM_ROW; row++) {
+        for (int col = 0; col < NUM_COL; col++) {
+            num = ((block->state).at(row)).at(col);
+            mvwprintw(BOARD[row * NUM_COL + col], SQ_HEIGHT / 2, SQ_WIDTH / 4,
+                      "%5d", num);
+            wrefresh(BOARD[row * NUM_COL + col]);
+        }
+    }
 }
 
 void create_board(void) {
