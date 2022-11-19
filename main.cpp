@@ -12,7 +12,7 @@ using namespace std;
 
 void create_board(void);
 void destroy_board(void);
-void set_val_board(blockLog *block);
+void display_value(blockLog *block);
 
 WINDOW *BOARD[16];
 
@@ -31,6 +31,32 @@ int main(int argc, char **argv) {
         exit(2);
     }
 
+    if (has_colors() == FALSE) {
+        puts("Terminal does not support colors!");
+        endwin();
+        return 1;
+    } else {
+        start_color();
+        init_pair(1, COLOR_RED, COLOR_BLUE);
+        init_pair(2, COLOR_BLUE, COLOR_BLACK);
+        init_pair(3, COLOR_CYAN, COLOR_BLACK);
+        init_pair(4, COLOR_GREEN, COLOR_BLACK);
+        init_pair(5, COLOR_MAGENTA, COLOR_BLACK);
+        init_pair(6, COLOR_RED, COLOR_BLACK);
+        init_pair(7, COLOR_WHITE, COLOR_BLACK);
+        init_pair(8, COLOR_YELLOW, COLOR_BLACK);
+
+        init_pair(9, COLOR_CYAN, COLOR_BLUE);
+        init_pair(10, COLOR_GREEN, COLOR_BLUE);
+        init_pair(11, COLOR_MAGENTA, COLOR_BLUE);
+        init_pair(12, COLOR_RED, COLOR_BLUE);
+        init_pair(13, COLOR_WHITE, COLOR_BLUE);
+        init_pair(14, COLOR_YELLOW, COLOR_BLUE);
+
+        init_pair(15, COLOR_BLUE, COLOR_CYAN);
+        init_pair(16, COLOR_GREEN, COLOR_CYAN);
+    }
+
     /* print welcome text */
     clear();
 
@@ -43,7 +69,7 @@ int main(int argc, char **argv) {
     block.state = {0};
     create_random(&block);
     create_board();
-    set_val_board(&block);
+    display_value(&block);
 
     /* */
 
@@ -58,14 +84,25 @@ int main(int argc, char **argv) {
     exit(0);
 }
 
-void set_val_board(blockLog *block) {
-    int num;
+void display_value(blockLog *block) {
+    int num_value;
+    int num_color_pair;
+
+    int tmp;
 
     for (int row = 0; row < NUM_ROW; row++) {
         for (int col = 0; col < NUM_COL; col++) {
-            num = ((block->state).at(row)).at(col);
+
+            num_value = ((block->state).at(row)).at(col);
+
+            num_color_pair = 1;
+
+            for (int tmp = 1; tmp < num_value; tmp *= 2)
+                num_color_pair++;
+
             mvwprintw(BOARD[row * NUM_COL + col], SQ_HEIGHT / 2, SQ_WIDTH / 4,
-                      "%5d", num);
+                      "%5d", num_value);
+            wbkgd(BOARD[row * NUM_COL + col], COLOR_PAIR(num_color_pair));
             wrefresh(BOARD[row * NUM_COL + col]);
         }
     }
