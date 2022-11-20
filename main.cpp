@@ -37,24 +37,24 @@ int main(int argc, char **argv) {
         return 1;
     } else {
         start_color();
-        init_pair(1, COLOR_RED, COLOR_BLUE);
-        init_pair(2, COLOR_BLUE, COLOR_BLACK);
+        init_pair(1, COLOR_WHITE, COLOR_BLACK);
+        init_pair(2, COLOR_RED, COLOR_BLACK);
         init_pair(3, COLOR_CYAN, COLOR_BLACK);
         init_pair(4, COLOR_GREEN, COLOR_BLACK);
         init_pair(5, COLOR_MAGENTA, COLOR_BLACK);
-        init_pair(6, COLOR_RED, COLOR_BLACK);
-        init_pair(7, COLOR_WHITE, COLOR_BLACK);
-        init_pair(8, COLOR_YELLOW, COLOR_BLACK);
+        init_pair(6, COLOR_BLUE, COLOR_BLACK);
+        init_pair(7, COLOR_YELLOW, COLOR_BLACK);
 
         init_pair(9, COLOR_CYAN, COLOR_BLUE);
         init_pair(10, COLOR_GREEN, COLOR_BLUE);
         init_pair(11, COLOR_MAGENTA, COLOR_BLUE);
         init_pair(12, COLOR_RED, COLOR_BLUE);
         init_pair(13, COLOR_WHITE, COLOR_BLUE);
-        init_pair(14, COLOR_YELLOW, COLOR_BLUE);
+        init_pair(8, COLOR_YELLOW, COLOR_BLUE);
 
-        init_pair(15, COLOR_BLUE, COLOR_CYAN);
-        init_pair(16, COLOR_GREEN, COLOR_CYAN);
+        init_pair(14, COLOR_BLUE, COLOR_WHITE);
+        init_pair(15, COLOR_GREEN, COLOR_WHITE);
+        init_pair(16, COLOR_RED, COLOR_WHITE);
     }
 
     /* print welcome text */
@@ -68,14 +68,39 @@ int main(int argc, char **argv) {
     block.term = 0;
     block.state = {0};
     create_random(&block);
-    create_board();
     display_value(&block);
-
+    // create_board();
     /* */
 
-    do {
+    while (1) {
         key = getch();
-    } while ((key != 'q') && (key != 'Q'));
+        switch (key) {
+
+        case 'w':
+            move_block_up(&block);
+            create_random(&block);
+            display_value(&block);
+            break;
+        case 's':
+            move_block_down(&block);
+            create_random(&block);
+            display_value(&block);
+            break;
+        case 'a':
+            move_block_left(&block);
+            create_random(&block);
+            display_value(&block);
+            break;
+        case 'd':
+            move_block_right(&block);
+            create_random(&block);
+            display_value(&block);
+            break;
+        }
+
+        if ((key == 'q') || (key == 'Q'))
+            break;
+    };
 
     /* when done, free up the board, and exit */
     destroy_board();
@@ -92,6 +117,8 @@ void display_value(blockLog *block) {
 
     for (int row = 0; row < NUM_ROW; row++) {
         for (int col = 0; col < NUM_COL; col++) {
+            wclear(BOARD[row * NUM_COL + col]);
+            create_board();
 
             num_value = ((block->state).at(row)).at(col);
 
@@ -140,7 +167,7 @@ void create_board(void) {
 
     for (i = 0; i < 30; i++) {
         box(BOARD[i], 0, 0);
-        wrefresh(BOARD[i]);
+        // wrefresh(BOARD[i]);
     }
 }
 
