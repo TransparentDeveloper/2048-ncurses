@@ -6,6 +6,7 @@
         "functional": "cpp",
         "random": "cpp",
         "ostream": "cpp",
-        "streambuf": "cpp"
+        "streambuf": "cpp",
+        "new": "cpp"
     }
 }

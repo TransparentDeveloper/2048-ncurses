@@ -19,17 +19,21 @@ WINDOW *BOARD[16];
 int main(int argc, char **argv) {
     int key;
 
-    /* initialize curses */
+    /* Initialize curses */
 
     initscr();
     noecho();
     curs_set(FALSE);
+
+    /* Assert window */
 
     if ((LINES < 24) || (COLS < 80)) {
         endwin();
         puts("Your terminal needs to be at least 80x24");
         exit(2);
     }
+
+    /* Assert color and Set_color_pair */
 
     if (has_colors() == FALSE) {
         puts("Terminal does not support colors!");
@@ -50,31 +54,45 @@ int main(int argc, char **argv) {
         init_pair(10, COLOR_MAGENTA, COLOR_BLUE);
         init_pair(11, COLOR_RED, COLOR_BLUE);
         init_pair(12, COLOR_WHITE, COLOR_BLUE);
-        init_pair(13, COLOR_YELLOW, COLOR_BLUE);
 
+        init_pair(13, COLOR_YELLOW, COLOR_WHITE);
         init_pair(14, COLOR_BLUE, COLOR_WHITE);
         init_pair(15, COLOR_GREEN, COLOR_WHITE);
         init_pair(16, COLOR_RED, COLOR_WHITE);
     }
 
-    /* print welcome text */
     clear();
 
+    /* Print game name */
     mvprintw(0, 0, "2048");
     refresh();
 
-    /* create value */
+    /* initialize block */
     blockLog block;
     block.term = 0;
+    block.score = 0;
     block.state = {0};
     create_random(&block);
+
+    /* Print block */
     display_value(&block);
 
-    /* */
+    /* Print score */
+    WINDOW *score_board = newwin(3, 20, 2, 32);
+    box(score_board, 0, 0);
+    mvwprintw(score_board, 1, 2, "score");
+    mvwprintw(score_board, 1, 10, "%9d", block.score);
+    wrefresh(score_board);
+
+    /* initialize array for checking change*/
     int compare_arr_1[4][4] = {0};
     int compare_arr_2[4][4] = {1};
 
+    /*initailize variable for score*/
+    int score = 0;
+
     while (1) {
+        score = 0;
         key = getch();
 
         /* Moving Page */
@@ -85,16 +103,16 @@ int main(int argc, char **argv) {
 
         switch (key) {
         case 'w':
-            move_block_up(&block);
+            score = move_block_up(&block);
             break;
         case 's':
-            move_block_down(&block);
+            score = move_block_down(&block);
             break;
         case 'a':
-            move_block_left(&block);
+            score = move_block_left(&block);
             break;
         case 'd':
-            move_block_right(&block);
+            score = move_block_right(&block);
             break;
         default:
             break;
@@ -118,6 +136,11 @@ int main(int argc, char **argv) {
         // if (compare_arr_1 == compare_arr_2), do move and create new block
         else {
             create_random(&block);
+
+            block.score += score;
+            mvwprintw(score_board, 1, 2, "score");
+            mvwprintw(score_board, 1, 10, "%9d", block.score);
+            wrefresh(score_board);
         }
 
         /* Displaying Page */
@@ -163,25 +186,25 @@ void create_board(void) {
 
     starty = 5;
     for (i = 0; i < NUM_COL; i++) {
-        startx = 10 + i * SQ_WIDTH;
+        startx = 5 + i * SQ_WIDTH;
         BOARD[i] = newwin(SQ_HEIGHT, SQ_WIDTH, starty, startx);
     }
 
     starty += SQ_HEIGHT;
     for (i = NUM_COL; i < NUM_COL * 2; i++) {
-        startx = 10 + (i % 4) * SQ_WIDTH;
+        startx = 5 + (i % 4) * SQ_WIDTH;
         BOARD[i] = newwin(SQ_HEIGHT, SQ_WIDTH, starty, startx);
     }
 
     starty += SQ_HEIGHT;
     for (i = NUM_COL * 2; i < NUM_COL * 3; i++) {
-        startx = 10 + (i % 4) * SQ_WIDTH;
+        startx = 5 + (i % 4) * SQ_WIDTH;
         BOARD[i] = newwin(SQ_HEIGHT, SQ_WIDTH, starty, startx);
     }
 
     starty += SQ_HEIGHT;
     for (i = NUM_COL * 3; i < NUM_COL * 4; i++) {
-        startx = 10 + (i % 4) * SQ_WIDTH;
+        startx = 5 + (i % 4) * SQ_WIDTH;
         BOARD[i] = newwin(SQ_HEIGHT, SQ_WIDTH, starty, startx);
     }
 
@@ -201,39 +224,6 @@ void destroy_board(void) {
     for (i = 0; i < 30; i++) {
         wborder(BOARD[i], ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ');
         wrefresh(BOARD[i]);
-
         delwin(BOARD[i]);
     }
 }
-
-// int timer() {
-//     int row = 10, col = 10;
-//     initscr();
-//     noecho();
-//     curs_set(FALSE);
-
-//     keypad(stdscr, TRUE);
-//     addch(ACS_ULCORNER);
-//     while (1) {
-//         int input = getch();
-//         clear();
-//         switch (input) {
-//         case KEY_UP:
-//             mvprintw(row += 3, col, "[ A ]");
-//             continue;
-//         case KEY_DOWN:
-//             mvprintw(row -= 3, col, "[ A ]");
-//             continue;
-//         case KEY_LEFT:
-//             mvprintw(row, col -= 5, "[ A ]");
-//             continue;
-//         case KEY_RIGHT:
-//             mvprintw(row, col += 5, "[ A ]");
-//             continue;
-//         }
-//         if (input == 'q')
-//             break;
-//     }
-//     endwin();
-//     return 0;
-// }

@@ -10,9 +10,10 @@ bool is_possible_moving(int (*compare_arr)[4], int (*target_arr)[4]) {
     return false;
 }
 
-void move_block_left(blockLog *test) {
+int move_block_left(blockLog *test) {
     int new_col = 0;
     int stop_point = 0;
+    int score = 0;
 
     for (int row = 0; row < 4; row++) {
         stop_point = 0;
@@ -38,6 +39,9 @@ void move_block_left(blockLog *test) {
                     ((test->state).at(row)).at(new_col) = 0;
                     new_col--;
 
+                    // Add score
+                    score += ((test->state).at(row)).at(new_col);
+
                     // Update stop_point
                     stop_point = new_col;
                 }
@@ -49,10 +53,13 @@ void move_block_left(blockLog *test) {
             }
         }
     }
+
+    return score;
 }
-void move_block_right(blockLog *test) {
+int move_block_right(blockLog *test) {
     int new_col = 0;
     int stop_point = 4 - 1;
+    int score = 0;
 
     for (int row = 0; row < 4; row++) {
         stop_point = 4 - 1;
@@ -77,6 +84,10 @@ void move_block_right(blockLog *test) {
                     ((test->state).at(row)).at(new_col + 1) *= 2;
                     ((test->state).at(row)).at(new_col) = 0;
                     new_col++;
+
+                    // Add score
+                    score += ((test->state).at(row)).at(new_col);
+
                     stop_point = new_col;
                 }
                 // if the value on the right is not 0 and is different from
@@ -87,10 +98,12 @@ void move_block_right(blockLog *test) {
             }
         }
     }
+    return score;
 }
-void move_block_up(blockLog *test) {
+int move_block_up(blockLog *test) {
     int new_row = 0;
     int stop_point = 0;
+    int score = 0;
 
     for (int col = 0; col < 4; col++) {
         stop_point = 0;
@@ -116,6 +129,10 @@ void move_block_up(blockLog *test) {
                     ((test->state).at(new_row - 1)).at(col) *= 2;
                     ((test->state).at(new_row)).at(col) = 0;
                     new_row--;
+
+                    // Add score
+                    score += ((test->state).at(new_row)).at(col);
+
                     stop_point = new_row;
                 }
                 // if the value above is not 0 and is different from itself
@@ -125,10 +142,13 @@ void move_block_up(blockLog *test) {
             }
         }
     }
+    return score;
 }
-void move_block_down(blockLog *test) {
+int move_block_down(blockLog *test) {
     int new_row = 0;
     int stop_point = 4 - 1;
+    int score = 0;
+
     for (int col = 0; col < 4; col++) {
         stop_point = 4 - 1;
 
@@ -153,6 +173,10 @@ void move_block_down(blockLog *test) {
                     ((test->state).at(new_row + 1)).at(col) *= 2;
                     ((test->state).at(new_row)).at(col) = 0;
                     new_row++;
+
+                    // Add score
+                    score += ((test->state).at(new_row)).at(col);
+
                     stop_point = new_row;
                 }
                 // if the value above is not 0 and is different from itself
@@ -162,6 +186,7 @@ void move_block_down(blockLog *test) {
             }
         }
     }
+    return score;
 }
 
 bool check_vaild(blockLog *test) {
