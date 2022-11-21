@@ -14,3 +14,4 @@ void move_block_left(blockLog *test);
 void move_block_right(blockLog *test);
 void move_block_up(blockLog *test);
 void move_block_down(blockLog *test);
+bool is_possible_moving(int (*compare_arr)[4], int (*target_arr)[4]);

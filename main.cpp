@@ -45,12 +45,12 @@ int main(int argc, char **argv) {
         init_pair(6, COLOR_BLUE, COLOR_BLACK);
         init_pair(7, COLOR_YELLOW, COLOR_BLACK);
 
-        init_pair(9, COLOR_CYAN, COLOR_BLUE);
-        init_pair(10, COLOR_GREEN, COLOR_BLUE);
-        init_pair(11, COLOR_MAGENTA, COLOR_BLUE);
-        init_pair(12, COLOR_RED, COLOR_BLUE);
-        init_pair(13, COLOR_WHITE, COLOR_BLUE);
-        init_pair(8, COLOR_YELLOW, COLOR_BLUE);
+        init_pair(8, COLOR_CYAN, COLOR_BLUE);
+        init_pair(9, COLOR_GREEN, COLOR_BLUE);
+        init_pair(10, COLOR_MAGENTA, COLOR_BLUE);
+        init_pair(11, COLOR_RED, COLOR_BLUE);
+        init_pair(12, COLOR_WHITE, COLOR_BLUE);
+        init_pair(13, COLOR_YELLOW, COLOR_BLUE);
 
         init_pair(14, COLOR_BLUE, COLOR_WHITE);
         init_pair(15, COLOR_GREEN, COLOR_WHITE);
@@ -69,37 +69,59 @@ int main(int argc, char **argv) {
     block.state = {0};
     create_random(&block);
     display_value(&block);
-    // create_board();
+
     /* */
+    int compare_arr_1[4][4] = {0};
+    int compare_arr_2[4][4] = {1};
 
     while (1) {
         key = getch();
-        switch (key) {
 
+        /* Moving Page */
+
+        // Save state before moving
+        copy(&block.state[0][0], &block.state[0][0] + NUM_COL * NUM_ROW,
+             &compare_arr_1[0][0]);
+
+        switch (key) {
         case 'w':
             move_block_up(&block);
-            create_random(&block);
-            display_value(&block);
             break;
         case 's':
             move_block_down(&block);
-            create_random(&block);
-            display_value(&block);
             break;
         case 'a':
             move_block_left(&block);
-            create_random(&block);
-            display_value(&block);
             break;
         case 'd':
             move_block_right(&block);
-            create_random(&block);
-            display_value(&block);
+            break;
+        default:
             break;
         }
 
         if ((key == 'q') || (key == 'Q'))
             break;
+
+        /* Checking Page */
+
+        // Save state after moving
+        copy(&block.state[0][0], &block.state[0][0] + NUM_COL * NUM_ROW,
+             &compare_arr_2[0][0]);
+
+        // if (compare_arr_1 == compare_arr_2), do not move
+        if (!is_possible_moving(compare_arr_1, compare_arr_2)) {
+            // block.state[1][1] = 64;
+            copy(&compare_arr_1[0][0], &compare_arr_1[0][0] + NUM_COL * NUM_ROW,
+                 &block.state[0][0]);
+        }
+        // if (compare_arr_1 == compare_arr_2), do move and create new block
+        else {
+            create_random(&block);
+        }
+
+        /* Displaying Page */
+        display_value(&block);
     };
 
     /* when done, free up the board, and exit */

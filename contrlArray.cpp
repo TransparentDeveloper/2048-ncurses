@@ -1,5 +1,17 @@
 #include "contrlArray.hpp"
 
+bool is_possible_moving(int (*compare_arr)[4], int (*target_arr)[4]) {
+    for (int row = 0; row < 4; row++) {
+        for (int col = 0; col < 4; col++) {
+            if (compare_arr[row][col] != target_arr[row][col])
+                return true;
+        }
+    }
+    return false;
+}
+
+
+
 void move_block_left(blockLog *test) {
     int new_col = 0;
     for (int row = 0; row < 4; row++) {
