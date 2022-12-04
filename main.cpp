@@ -1,4 +1,4 @@
-#include "contrlArray.cpp"
+#include "ControlArray.hpp"
 #include <ncurses.h>
 #include <stdlib.h>
 #include <string>
@@ -12,15 +12,12 @@ using namespace std;
 
 void create_board(void);
 void destroy_board(void);
-void display_value(blockLog *block);
+void display_value(ControlArray *CA);
 
 WINDOW *BOARD[16];
 
 int main(int argc, char **argv) {
     int key;
-
-    /* Initialize curses */
-
     initscr();
     noecho();
     curs_set(FALSE);
@@ -67,21 +64,18 @@ int main(int argc, char **argv) {
     mvprintw(0, 0, "2048");
     refresh();
 
-    /* initialize block */
-    blockLog block;
-    block.term = 0;
-    block.score = 0;
-    block.state = {0};
-    create_random(&block);
+    /* initialize array */
+    ControlArray CA;
+    CA.create_random();
 
     /* Print block */
-    display_value(&block);
+    display_value(&CA);
 
     /* Print score */
     WINDOW *score_board = newwin(3, 20, 2, 32);
     box(score_board, 0, 0);
     mvwprintw(score_board, 1, 2, "score");
-    mvwprintw(score_board, 1, 10, "%9d", block.score);
+    mvwprintw(score_board, 1, 10, "%9d", CA.get_score());
     wrefresh(score_board);
 
     /* initialize array for checking change*/
@@ -89,30 +83,31 @@ int main(int argc, char **argv) {
     int compare_arr_2[4][4] = {1};
 
     /*initailize variable for score*/
-    int score = 0;
 
     while (1) {
-        score = 0;
         key = getch();
 
         /* Moving Page */
 
         // Save state before moving
-        copy(&block.state[0][0], &block.state[0][0] + NUM_COL * NUM_ROW,
-             &compare_arr_1[0][0]);
+        for (int row = 0; row < 4; row++) {
+            for (int col = 0; col < 4; col++) {
+                compare_arr_1[row][col] = CA.at(row, col);
+            }
+        }
 
         switch (key) {
         case 'w':
-            score = move_block_up(&block);
+            CA.move_block_up();
             break;
         case 's':
-            score = move_block_down(&block);
+            CA.move_block_down();
             break;
         case 'a':
-            score = move_block_left(&block);
+            CA.move_block_left();
             break;
         case 'd':
-            score = move_block_right(&block);
+            CA.move_block_right();
             break;
         default:
             break;
@@ -124,27 +119,31 @@ int main(int argc, char **argv) {
         /* Checking Page */
 
         // Save state after moving
-        copy(&block.state[0][0], &block.state[0][0] + NUM_COL * NUM_ROW,
-             &compare_arr_2[0][0]);
+        for (int row = 0; row < 4; row++) {
+            for (int col = 0; col < 4; col++) {
+                compare_arr_2[row][col] = CA.at(row, col);
+            }
+        }
 
         // if (compare_arr_1 == compare_arr_2), do not move
-        if (!is_possible_moving(compare_arr_1, compare_arr_2)) {
-            // block.state[1][1] = 64;
-            copy(&compare_arr_1[0][0], &compare_arr_1[0][0] + NUM_COL * NUM_ROW,
-                 &block.state[0][0]);
+        if (!CA.is_possible_moving(compare_arr_1, compare_arr_2)) {
+            for (int row = 0; row < 4; row++) {
+                for (int col = 0; col < 4; col++) {
+                    CA.set_arr2d_compoent(row, col, compare_arr_1[row][col]);
+                }
+            }
         }
-        // if (compare_arr_1 == compare_arr_2), do move and create new block
+        // if (compare_arr_1 == compare_arr_2), do move and create
         else {
-            create_random(&block);
+            CA.create_random();
 
-            block.score += score;
             mvwprintw(score_board, 1, 2, "score");
-            mvwprintw(score_board, 1, 10, "%9d", block.score);
+            mvwprintw(score_board, 1, 10, "%9d", CA.get_score());
             wrefresh(score_board);
         }
 
         /* Displaying Page */
-        display_value(&block);
+        display_value(&CA);
     };
 
     /* when done, free up the board, and exit */
@@ -154,7 +153,7 @@ int main(int argc, char **argv) {
     exit(0);
 }
 
-void display_value(blockLog *block) {
+void display_value(ControlArray *CA) {
     int num_value;
     int num_color_pair;
 
@@ -165,7 +164,7 @@ void display_value(blockLog *block) {
             wclear(BOARD[row * NUM_COL + col]);
             create_board();
 
-            num_value = ((block->state).at(row)).at(col);
+            num_value = CA->at(row, col);
 
             num_color_pair = 1;
 
