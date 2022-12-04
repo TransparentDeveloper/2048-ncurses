@@ -58,12 +58,18 @@ int main(int argc, char **argv) {
         init_pair(14, COLOR_BLUE, COLOR_WHITE);
         init_pair(15, COLOR_GREEN, COLOR_WHITE);
         init_pair(16, COLOR_RED, COLOR_WHITE);
+        init_pair(17, COLOR_BLACK, COLOR_WHITE);
     }
 
     clear();
 
     /* Print game name */
-    mvprintw(0, 0, "2048");
+    mvprintw(0, 0, "#######   #######      ###    #######");
+    mvprintw(1, 0, "##   ##   #    ##     # ##    #    ##");
+    mvprintw(2, 0, "    ###   #    ##    #  ##    #######");
+    mvprintw(3, 0, "   ###    #    ##   #   ##    #   ###");
+    mvprintw(4, 0, " ##       #    ##   #######   #    ##");
+    mvprintw(5, 0, "#######   #######       ##    #######");
     refresh();
 
     /* initialize array */
@@ -78,11 +84,18 @@ int main(int argc, char **argv) {
     display_value(&CA);
 
     /* Print score */
-    WINDOW *score_board = newwin(3, 20, 2, 32);
+    WINDOW *score_board = newwin(3, 20, 2 + 5, 33);
     box(score_board, 0, 0);
     mvwprintw(score_board, 1, 2, "score");
     mvwprintw(score_board, 1, 10, "%9d", CA.get_score());
     wrefresh(score_board);
+
+    /* Print term */
+    WINDOW *term_board = newwin(3, 20, 2 + 5, 5);
+    box(term_board, 0, 0);
+    mvwprintw(term_board, 1, 2, "term");
+    mvwprintw(term_board, 1, 10, "%9d", CA.get_term());
+    wrefresh(term_board);
 
     /* initialize array for checking change*/
     int compare_arr_1[NUM_ROW][NUM_COL] = {};
@@ -178,11 +191,49 @@ int main(int argc, char **argv) {
         }
 
         /* Displaying Page */
+
+        // Update value board
         display_value(&CA);
+
+        // Update score board
         mvwprintw(score_board, 1, 2, "score");
         mvwprintw(score_board, 1, 10, "%9d", CA.get_score());
         wrefresh(score_board);
+
+        // Update term board
+        mvwprintw(term_board, 1, 2, "term");
+        mvwprintw(term_board, 1, 10, "%9d", CA.get_term());
+        wrefresh(term_board);
     };
+
+    clear();
+    mvprintw(0, 0,
+             "#######   #######   #######   #######   #######   #######   "
+             "#######   #######");
+    mvprintw(1, 0,
+             "#######   #######   #######   #######   #######   #######   "
+             "#######   #######");
+    mvprintw(2, 0,
+             "#######   #######   #######   #######   #######   #######   "
+             "#######   #######");
+    mvprintw(3, 0,
+             "#######   #######   #######   #######   #######   #######   "
+             "#######   #######");
+    mvprintw(4, 0,
+             "#######   #######   #######   #######   #######   #######   "
+             "#######   #######");
+    mvprintw(5, 0,
+             "#######   #######   #######   #######   #######   #######   "
+             "#######   #######");
+    mvprintw(7, 0, "Your score is : %9d", CA.get_score());
+    mvprintw(8, 0, "(Press 'q' to exit.)");
+    refresh();
+
+    while (1) {
+        key = getch();
+        if ((key == 'q') || (key == 'Q'))
+            break;
+    }
 
     /* when done, free up the board, and exit */
     destroy_board();
@@ -221,7 +272,7 @@ void create_board(void) {
     int i;
     int starty, startx;
 
-    starty = 5;
+    starty = 10;
     for (i = 0; i < NUM_COL; i++) {
         startx = 5 + i * SQ_WIDTH;
         BOARD[i] = newwin(SQ_HEIGHT, SQ_WIDTH, starty, startx);
