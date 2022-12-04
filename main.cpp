@@ -1,5 +1,6 @@
 #include "ControlArray.hpp"
 #include <ncurses.h>
+#include <stack>
 #include <stdlib.h>
 #include <string>
 
@@ -18,6 +19,7 @@ WINDOW *BOARD[16];
 
 int main(int argc, char **argv) {
     int key;
+
     initscr();
     noecho();
     curs_set(FALSE);
@@ -68,6 +70,10 @@ int main(int argc, char **argv) {
     ControlArray CA;
     CA.create_random();
 
+    /* initialize Stack */
+    stack<int> values_log;
+    stack<int> scores_log;
+
     /* Print block */
     display_value(&CA);
 
@@ -79,10 +85,11 @@ int main(int argc, char **argv) {
     wrefresh(score_board);
 
     /* initialize array for checking change*/
-    int compare_arr_1[4][4] = {0};
-    int compare_arr_2[4][4] = {1};
+    int compare_arr_1[NUM_ROW][NUM_COL] = {};
+    int compare_arr_2[NUM_ROW][NUM_COL] = {};
 
     /*initailize variable for score*/
+    int score = 0;
 
     while (1) {
         key = getch();
@@ -95,6 +102,7 @@ int main(int argc, char **argv) {
                 compare_arr_1[row][col] = CA.at(row, col);
             }
         }
+        score = CA.get_score();
 
         switch (key) {
         case 'w':
@@ -109,6 +117,24 @@ int main(int argc, char **argv) {
         case 'd':
             CA.move_block_right();
             break;
+
+        case 'b': // undo
+            if (CA.get_term() == 1)
+                break;
+
+            for (int row = NUM_ROW - 1; row >= 0; row--) {
+                for (int col = NUM_COL - 1; col >= 0; col--) {
+                    CA.set_arr2d_compoent(row, col, values_log.top());
+                    values_log.pop();
+                }
+            }
+
+            CA.set_score(scores_log.top());
+            scores_log.pop();
+            CA.decrease_term();
+
+            break;
+
         default:
             break;
         }
@@ -125,25 +151,37 @@ int main(int argc, char **argv) {
             }
         }
 
+        if (key == 'b') {
+        }
         // if (compare_arr_1 == compare_arr_2), do not move
-        if (!CA.is_possible_moving(compare_arr_1, compare_arr_2)) {
+        else if (!CA.is_possible_moving(compare_arr_1, compare_arr_2)) {
             for (int row = 0; row < 4; row++) {
                 for (int col = 0; col < 4; col++) {
                     CA.set_arr2d_compoent(row, col, compare_arr_1[row][col]);
                 }
             }
         }
-        // if (compare_arr_1 == compare_arr_2), do move and create
+        // if (compare_arr_1 == compare_arr_2), do move
         else {
-            CA.create_random();
 
-            mvwprintw(score_board, 1, 2, "score");
-            mvwprintw(score_board, 1, 10, "%9d", CA.get_score());
-            wrefresh(score_board);
+            // Update stack
+            for (int row = 0; row < NUM_ROW; row++) {
+                for (int col = 0; col < NUM_COL; col++) {
+                    values_log.push(compare_arr_1[row][col]);
+                }
+            }
+            scores_log.push(score);
+            // create new block
+            CA.create_random();
+            // go next term
+            CA.increase_term();
         }
 
         /* Displaying Page */
         display_value(&CA);
+        mvwprintw(score_board, 1, 2, "score");
+        mvwprintw(score_board, 1, 10, "%9d", CA.get_score());
+        wrefresh(score_board);
     };
 
     /* when done, free up the board, and exit */

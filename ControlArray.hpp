@@ -9,6 +9,12 @@ class ControlArray {
     int get_term();
     int get_score();
     int at(int y, int x);
+
+    void increase_term();
+    void decrease_term();
+
+    void set_term(int term);
+    void set_score(int score);
     void set_arr2d_compoent(int y, int x, int num);
 
     bool check_isZero();

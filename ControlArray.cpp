@@ -3,7 +3,7 @@
 #include <ctime>   //time()
 
 ControlArray::ControlArray() {
-    term = 1;
+    this->term = 1;
     score = 0;
     arr2d = new int *[4];
 
@@ -25,6 +25,11 @@ int ControlArray::get_score() { return score; }
 
 int ControlArray::at(int y, int x) { return this->arr2d[y][x]; }
 
+void ControlArray::set_term(int term) { this->term = term; }
+void ControlArray::set_score(int score) { this->score = score; }
+
+void ControlArray::increase_term() { (this->term)++; }
+void ControlArray::decrease_term() { (this->term)--; }
 void ControlArray::set_arr2d_compoent(int y, int x, int num) {
     this->arr2d[y][x] = num;
 }
