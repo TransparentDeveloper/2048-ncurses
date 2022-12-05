@@ -64,12 +64,14 @@ int main(int argc, char **argv) {
     clear();
 
     /* Print game name */
-    mvprintw(0, 0, "#######   #######      ###    #######");
-    mvprintw(1, 0, "##   ##   #    ##     # ##    #    ##");
-    mvprintw(2, 0, "    ###   #    ##    #  ##    #######");
-    mvprintw(3, 0, "   ###    #    ##   #   ##    #   ###");
-    mvprintw(4, 0, " ##       #    ##   #######   #    ##");
-    mvprintw(5, 0, "#######   #######       ##    #######");
+    attron(A_BOLD);
+    mvprintw(0, 2, "#######   #######      ###    #######");
+    mvprintw(1, 2, "##   ##   #    ##     # ##    #    ##");
+    mvprintw(2, 2, "    ###   #    ##    #  ##    #######");
+    mvprintw(3, 2, "   ###    #    ##   #   ##    #   ###");
+    mvprintw(4, 2, " ##       #    ##   #######   #    ##");
+    mvprintw(5, 2, "#######   #######       ##    #######");
+    attroff(A_BOLD);
     refresh();
 
     /* initialize array */
@@ -84,18 +86,32 @@ int main(int argc, char **argv) {
     display_value(&CA);
 
     /* Print score */
-    WINDOW *score_board = newwin(3, 20, 2 + 5, 33);
+    WINDOW *score_board = newwin(3, 20, 2 + 5, 30);
     box(score_board, 0, 0);
     mvwprintw(score_board, 1, 2, "score");
     mvwprintw(score_board, 1, 10, "%9d", CA.get_score());
     wrefresh(score_board);
 
     /* Print term */
-    WINDOW *term_board = newwin(3, 20, 2 + 5, 5);
+    WINDOW *term_board = newwin(3, 20, 2 + 5, 2);
     box(term_board, 0, 0);
     mvwprintw(term_board, 1, 2, "term");
     mvwprintw(term_board, 1, 10, "%9d", CA.get_term());
     wrefresh(term_board);
+
+    /* Print usage */
+    WINDOW *usage_board = newwin(12, 40, 2 + 5, 50 + 2);
+    box(usage_board, 0, 0);
+    mvwprintw(usage_board, 1, 2, "! Usage !");
+    mvwprintw(usage_board, 2, 2, "Press the key below");
+    mvwprintw(usage_board, 4, 2, "- \'w\' : move the block upwards.");
+    mvwprintw(usage_board, 5, 2, "- \'s\' : move the block downwards.");
+    mvwprintw(usage_board, 6, 2, "- \'a\' : move the block to the left.");
+    mvwprintw(usage_board, 7, 2, "- \'d\' : move the block to the rigth.");
+    mvwprintw(usage_board, 9, 2, "- \'u\' : undo.");
+    mvwprintw(usage_board, 10, 2, "- \'q\' : exit game.");
+
+    wrefresh(usage_board);
 
     /* initialize array for checking change*/
     int compare_arr_1[NUM_ROW][NUM_COL] = {};
@@ -118,20 +134,25 @@ int main(int argc, char **argv) {
         score = CA.get_score();
 
         switch (key) {
+        case 'W':
         case 'w':
             CA.move_block_up();
             break;
+        case 'S':
         case 's':
             CA.move_block_down();
             break;
+        case 'A':
         case 'a':
             CA.move_block_left();
             break;
+        case 'D':
         case 'd':
             CA.move_block_right();
             break;
 
-        case 'b': // undo
+        case 'u': // undo
+        case 'U':
             if (CA.get_term() == 1)
                 break;
 
@@ -164,7 +185,7 @@ int main(int argc, char **argv) {
             }
         }
 
-        if (key == 'b') {
+        if ((key == 'u') || (key == 'U')) {
         }
         // if (compare_arr_1 == compare_arr_2), do not move
         else if (!CA.is_possible_moving(compare_arr_1, compare_arr_2)) {
@@ -207,26 +228,32 @@ int main(int argc, char **argv) {
     };
 
     clear();
-    mvprintw(0, 0,
-             "#######   #######   #######   #######   #######   #######   "
-             "#######   #######");
-    mvprintw(1, 0,
-             "#######   #######   #######   #######   #######   #######   "
-             "#######   #######");
-    mvprintw(2, 0,
-             "#######   #######   #######   #######   #######   #######   "
-             "#######   #######");
-    mvprintw(3, 0,
-             "#######   #######   #######   #######   #######   #######   "
-             "#######   #######");
-    mvprintw(4, 0,
-             "#######   #######   #######   #######   #######   #######   "
-             "#######   #######");
-    mvprintw(5, 0,
-             "#######   #######   #######   #######   #######   #######   "
-             "#######   #######");
-    mvprintw(7, 0, "Your score is : %9d", CA.get_score());
-    mvprintw(8, 0, "(Press 'q' to exit.)");
+    attron(A_BOLD);
+    mvprintw(0, 5,
+             "  ###        ##      #   #    #######      #######   #     #   "
+             "#######   ######");
+    mvprintw(
+        1, 5,
+        "##   ##     ####    ### ###   ###          #    ##   ##   ##   ###  "
+        "     ##   ##");
+    mvprintw(2, 5,
+             "#          #   ##   ### ###   #######      #    ##   ##   ##   "
+             "#######   ##  ###");
+    mvprintw(
+        3, 5,
+        "#  ####   #######   # ### #   ###          #    ##   ##  ###   ###  "
+        "     ###### ");
+    mvprintw(
+        4, 5,
+        " #  # #   ##   ##   #  #  #   ###          #    ##    #####    ###  "
+        "     ###  ##");
+    mvprintw(5, 5,
+             "  ### #   #     #   #  #  #   #######      #######     ###     "
+             "#######   ##    #");
+
+    mvprintw(7, 5, "Your score is : %9d", CA.get_score());
+    mvprintw(8, 5, "(Press 'q' to exit this program.)");
+    attroff(A_BOLD);
     refresh();
 
     while (1) {
@@ -274,25 +301,25 @@ void create_board(void) {
 
     starty = 10;
     for (i = 0; i < NUM_COL; i++) {
-        startx = 5 + i * SQ_WIDTH;
+        startx = 2 + i * SQ_WIDTH;
         BOARD[i] = newwin(SQ_HEIGHT, SQ_WIDTH, starty, startx);
     }
 
     starty += SQ_HEIGHT;
     for (i = NUM_COL; i < NUM_COL * 2; i++) {
-        startx = 5 + (i % 4) * SQ_WIDTH;
+        startx = 2 + (i % 4) * SQ_WIDTH;
         BOARD[i] = newwin(SQ_HEIGHT, SQ_WIDTH, starty, startx);
     }
 
     starty += SQ_HEIGHT;
     for (i = NUM_COL * 2; i < NUM_COL * 3; i++) {
-        startx = 5 + (i % 4) * SQ_WIDTH;
+        startx = 2 + (i % 4) * SQ_WIDTH;
         BOARD[i] = newwin(SQ_HEIGHT, SQ_WIDTH, starty, startx);
     }
 
     starty += SQ_HEIGHT;
     for (i = NUM_COL * 3; i < NUM_COL * 4; i++) {
-        startx = 5 + (i % 4) * SQ_WIDTH;
+        startx = 2 + (i % 4) * SQ_WIDTH;
         BOARD[i] = newwin(SQ_HEIGHT, SQ_WIDTH, starty, startx);
     }
 
