@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "array": "cpp",
+        "cstdlib": "cpp",
+        "*.tcc": "cpp",
+        "functional": "cpp",
+        "random": "cpp",
+        "ostream": "cpp",
+        "streambuf": "cpp",
+        "new": "cpp"
+    }
+}
